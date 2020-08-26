@@ -1,0 +1,49 @@
+version: '3'
+
+services:
+  api:
+    container_name: code-challange-api
+    working_dir: /usr/src/app
+    build: .
+    restart: on-failure
+    depends_on:
+      - db
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - '5000:5000'
+    networks:
+      - code-challange-network
+    command: yarn dev
+  db:
+    container_name: code-challange-db
+    image: postgres:11
+    restart: always
+    volumes:
+      - ./db:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+    env_file:
+      - '.env'
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+    networks:
+      - code-challange-network
+  pgadmin:
+    container_name: code-challange-pgadmin
+    image: dpage/pgadmin4
+    restart: always
+    ports:
+      - '5050:80'
+    env_file:
+      - '.env'
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+    networks:
+      - code-challange-network
+networks:
+  code-challange-network:
